@@ -1,0 +1,36 @@
+name: Build Lambda Package
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt -t package
+
+      - name: Copy app files
+        run: |
+          cp main.py package/
+
+      - name: Zip package
+        run: |
+          cd package
+          zip -r ../function.zip .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lambda-package
+          path: function.zip
